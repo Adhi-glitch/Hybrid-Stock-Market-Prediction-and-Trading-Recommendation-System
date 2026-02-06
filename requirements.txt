@@ -1,0 +1,11 @@
+numpy>=1.21.0
+pandas>=1.3.0
+matplotlib>=3.4.0
+plotly>=5.0.0
+scikit-learn>=1.0.0
+tensorflow>=2.8.0
+yfinance>=0.1.70
+torch>=1.9.0
+transformers>=4.20.0
+requests>=2.27.0
+sentencepiece>=0.1.96

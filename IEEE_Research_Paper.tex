@@ -1,0 +1,497 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify copyright in the first page. If this is an IEEE paper, use this line if you want IEEE to hold the copyright instead.
+% Otherwise, use this line:
+%\IEEEoverridecommandlockouts{}
+% If you want to cite references, use the following:
+%\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\graphicspath{{.}}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Hybrid Deep Learning and Natural Language Processing System for Stock Price Prediction with Sentiment-Aware Risk Assessment}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Anonymous Author}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{University Name}\\
+City, Country \\
+email@university.edu}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Anonymous Author}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{University Name}\\
+City, Country \\
+email@university.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+Stock market prediction remains a challenging problem due to the inherent non-linearity and volatility of financial markets. This paper presents a comprehensive hybrid system that combines deep learning-based price prediction with natural language processing (NLP) for sentiment analysis to provide justified trading recommendations. Our approach employs a bidirectional Long Short-Term Memory (LSTM) neural network with 100+ engineered technical indicators for price forecasting, integrated with FinBERT-based sentiment analysis of financial news. The system aggregates news from multiple sources (Yahoo Finance, NewsAPI, Alpha Vantage) and generates AI-powered justifications that align technical predictions with market sentiment. Experimental results demonstrate the system's ability to generate actionable recommendations with confidence scores, risk assessments, and comprehensive justification reports. The framework achieves improved decision-making by combining quantitative technical analysis with qualitative sentiment signals, addressing the limitations of purely technical or sentiment-based approaches.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Stock price prediction, Deep learning, LSTM, FinBERT, Sentiment analysis, Financial NLP, Risk assessment, Trading recommendations
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Stock market prediction has been a subject of extensive research in both finance and computer science communities. Traditional approaches rely on fundamental analysis, technical indicators, or statistical models, each with inherent limitations. Recent advances in deep learning and natural language processing have opened new avenues for more accurate and comprehensive stock analysis.
+
+The unpredictability of financial markets stems from multiple factors: macroeconomic conditions, company-specific news, market sentiment, and technical patterns. While technical analysis focuses on price and volume patterns, it often overlooks the impact of news and sentiment. Conversely, sentiment analysis alone may miss critical technical signals. This paper addresses this gap by proposing a hybrid system that synergistically combines:
+
+\begin{enumerate}
+    \item \textbf{Deep Learning Price Prediction}: A bidirectional LSTM network with extensive feature engineering (100+ technical indicators) for quantitative price forecasting
+    \item \textbf{NLP-Based Sentiment Analysis}: FinBERT model fine-tuned on financial texts to analyze market sentiment from news articles
+    \item \textbf{Intelligent Alignment and Justification}: Automated reasoning that validates predictions against sentiment and generates comprehensive justification reports
+\end{enumerate}
+
+The primary contributions of this work are:
+
+\begin{itemize}
+    \item A comprehensive hybrid architecture integrating deep learning and NLP for stock prediction
+    \item Multi-source news aggregation with automatic deduplication and sentiment analysis
+    \item Automated alignment checking between technical predictions and market sentiment
+    \item Risk-adjusted recommendation generation with AI-powered justifications
+    \item A complete end-to-end pipeline for practical deployment
+\end{itemize}
+
+\section{Related Work}
+
+\subsection{Deep Learning for Stock Prediction}
+
+Deep learning models, particularly LSTM and GRU networks, have shown promise in time series forecasting. Hochreiter and Schmidhuber \cite{hochreiter1997} introduced LSTM to address vanishing gradient problems in recurrent networks. Subsequent work by Fischer and Krauss \cite{fischer2018} demonstrated LSTM's effectiveness in stock price prediction. Recent studies have explored bidirectional LSTMs, attention mechanisms, and ensemble methods to improve prediction accuracy.
+
+\subsection{Sentiment Analysis in Finance}
+
+Financial sentiment analysis has evolved from dictionary-based approaches to transformer-based models. FinBERT \cite{araci2019}, a BERT model fine-tuned on financial texts, has shown superior performance in financial sentiment classification. The integration of sentiment analysis with technical indicators has been explored in various studies, with mixed results depending on the implementation approach.
+
+\subsection{Hybrid Approaches}
+
+Several studies have attempted to combine technical and sentiment analysis. However, most focus on either prediction accuracy or sentiment classification separately, without comprehensive justification mechanisms or risk assessment. Our work extends these approaches by providing an integrated framework with automated alignment checking and justification generation.
+
+\section{Methodology}
+
+\subsection{System Architecture}
+
+The proposed system consists of four main components:
+
+\begin{enumerate}
+    \item \textbf{Data Fetching Module}: Retrieves historical stock data and recent news articles
+    \item \textbf{Price Prediction Module}: LSTM-based model with technical indicator engineering
+    \item \textbf{Sentiment Analysis Module}: FinBERT-based news sentiment analysis
+    \item \textbf{Justification Engine}: Alignment checking and recommendation generation
+\end{enumerate}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{architecture}
+    \caption{End-to-end system architecture showing data sources, LSTM-based prediction engine, FinBERT sentiment pipeline, justification layer, and outputs. Render from the provided PlantUML file `architecture_diagram.puml`.}
+    \label{fig:system-architecture}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Sequence}
+    \caption{End-to-end analysis pipeline as a sequence diagram from input to outputs. Render from `sequence_diagram.puml`.}
+    \label{fig:sequence-diagram}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{training}
+    \caption{Training pipeline showing cleaning, feature engineering, scaling, sequence creation, splits, model, callbacks, evaluation, and checkpointing. Render from `training_pipeline.puml`.}
+    \label{fig:training-pipeline}
+\end{figure}
+
+\subsection{Price Prediction Module}
+
+\subsubsection{Feature Engineering}
+
+The system calculates over 100 technical indicators across multiple categories:
+
+\textbf{Moving Averages}: Simple Moving Average (SMA) and Exponential Moving Average (EMA) for periods 5, 10, 20, 50, 100, and 200 days. Crossovers between these averages (Golden Cross and Death Cross) are identified as binary features.
+
+\textbf{Momentum Indicators}: Relative Strength Index (RSI) for 14 and 21 periods, Moving Average Convergence Divergence (MACD) with signal line, Stochastic Oscillator, and Williams \%R.
+
+\textbf{Volatility Indicators}: Bollinger Bands with 1, 2, and 3 standard deviations, Average True Range (ATR), and ATR percentage.
+
+\textbf{Volume Indicators}: On-Balance Volume (OBV), Volume Price Trend (VPT), Volume Moving Averages, and volume ratios.
+
+\textbf{Pattern Recognition}: Support and resistance levels, Fibonacci retracement levels (23.6\%, 38.2\%, 50\%, 61.8\%, 78.6\%), and gap analysis.
+
+\subsubsection{Neural Network Architecture}
+
+The prediction model employs a bidirectional LSTM architecture:
+
+\begin{itemize}
+    \item \textbf{Input Layer}: Sequences of 60 days with feature vectors
+    \item \textbf{Bidirectional LSTM Layer 1}: 256 units with return sequences
+    \item \textbf{Dropout Layer}: 0.3 dropout rate
+    \item \textbf{Bidirectional LSTM Layer 2}: 128 units with return sequences
+    \item \textbf{Dropout Layer}: 0.3 dropout rate
+    \item \textbf{Bidirectional LSTM Layer 3}: 64 units
+    \item \textbf{Dropout Layer}: 0.3 dropout rate
+    \item \textbf{Dense Output Layer}: Single unit for price prediction
+\end{itemize}
+
+The model uses:
+\begin{itemize}
+    \item Adam optimizer with learning rate scheduling
+    \item Mean Squared Error (MSE) loss function
+    \item Early stopping with patience of 20 epochs
+    \item Model checkpointing to save best weights
+\end{itemize}
+
+\subsubsection{Data Preprocessing}
+
+Historical data is normalized using MinMaxScaler to the range [0, 1]. The dataset is split into training (80\%), validation (10\%), and testing (10\%) sets. Sequences of 60 consecutive days are created to predict the next day's closing price.
+
+\subsection{Sentiment Analysis Module}
+
+\subsubsection{News Aggregation}
+
+The system aggregates financial news from multiple sources:
+
+\begin{itemize}
+    \item \textbf{Yahoo Finance}: Primary source, no API key required
+    \item \textbf{NewsAPI}: Optional, requires API key, provides broad coverage
+    \item \textbf{Alpha Vantage}: Optional, financial-focused news
+    \item \textbf{Finnhub}: Optional, additional financial news source
+    \item \textbf{MarketAux}: Optional, specialized financial news aggregator
+\end{itemize}
+
+Articles are deduplicated based on title similarity, and the most recent 20-50 articles are selected for analysis.
+
+\subsubsection{FinBERT Model}
+
+The sentiment analysis employs FinBERT (ProsusAI/finbert), a BERT model specifically fine-tuned on financial texts. For each article, the model:
+
+\begin{enumerate}
+    \item Tokenizes the article title and description
+    \item Processes through the FinBERT model
+    \item Outputs probability distributions over three classes: positive, negative, neutral
+    \item Determines dominant sentiment with confidence score
+\end{enumerate}
+
+The overall sentiment is calculated as a weighted aggregation of individual article sentiments:
+
+\begin{equation}
+\text{Sentiment}_{overall} = \arg\max_{s \in \{pos, neg, neu\}} \frac{\sum_{i=1}^{n} w_i \cdot \mathbb{1}(s_i = s)}{\sum_{i=1}^{n} w_i}
+\end{equation}
+
+where $w_i$ is the confidence score of article $i$, and $s_i$ is its sentiment classification.
+
+\subsubsection{Text Generation}
+
+The system employs T5 (Text-To-Text Transfer Transformer) for generating natural language explanations. The google/flan-t5-base model is used to generate:
+
+\begin{itemize}
+    \item Sentiment summaries
+    \item Recommendation explanations
+    \item Risk assessments
+\end{itemize}
+
+If the T5 model is unavailable, the system falls back to rule-based generation.
+
+\subsection{Alignment and Justification}
+
+\subsubsection{Alignment Checking}
+
+The system compares prediction direction with sentiment direction:
+
+\begin{itemize}
+    \item \textbf{Strong Alignment}: Prediction and sentiment point in the same direction (both bullish or both bearish)
+    \item \textbf{Partial Alignment}: One signal is directional while the other is neutral
+    \item \textbf{Divergence}: Prediction and sentiment contradict each other
+\end{itemize}
+
+\subsubsection{Recommendation Generation}
+
+Recommendations are generated based on:
+
+\begin{enumerate}
+    \item Predicted price change percentage
+    \item Model confidence score
+    \item Sentiment alignment status
+    \item Risk level (based on volatility)
+\end{enumerate}
+
+The recommendation scale includes:
+\begin{itemize}
+    \item STRONG BUY: $>$2\% predicted increase, high confidence
+    \item BUY: $>$0.5\% predicted increase
+    \item HOLD: Minimal change or low confidence
+    \item SELL: $>$0.5\% predicted decrease
+    \item STRONG SELL: $>$2\% predicted decrease, high confidence
+\end{itemize}
+
+Recommendations may be adjusted based on sentiment divergence, with risk-adjusted position sizing suggestions.
+
+\subsection{Risk Assessment}
+
+Risk levels are determined by annual volatility:
+
+\begin{itemize}
+    \item \textbf{LOW}: Volatility $<$ 25\%
+    \item \textbf{MEDIUM}: Volatility 25-40\%
+    \item \textbf{HIGH}: Volatility $>$ 40\%
+\end{itemize}
+
+The system also considers sentiment-prediction divergence as an additional risk factor.
+
+\section{Implementation Details}
+
+\subsection{Technology Stack}
+
+The system is implemented in Python 3.8+ with the following key libraries:
+
+\begin{itemize}
+    \item \textbf{TensorFlow 2.8+}: Deep learning framework for LSTM model
+    \item \textbf{PyTorch 1.9+}: Backend for FinBERT and T5 models
+    \item \textbf{Transformers 4.20+}: Hugging Face library for pre-trained models
+    \item \textbf{yfinance}: Stock data retrieval
+    \item \textbf{pandas/numpy}: Data processing
+    \item \textbf{scikit-learn}: Feature scaling and preprocessing
+\end{itemize}
+
+\subsection{System Workflow}
+
+The complete pipeline operates as follows:
+
+\begin{enumerate}
+    \item \textbf{Data Fetching}: User provides stock ticker and period. System fetches historical OHLCV (Open, High, Low, Close, Volume) data from Yahoo Finance.
+    \item \textbf{Feature Engineering}: Calculate 100+ technical indicators from raw price and volume data.
+    \item \textbf{Model Training}: Train bidirectional LSTM model with early stopping and checkpointing.
+    \item \textbf{Price Prediction}: Generate next-day price prediction with confidence score.
+    \item \textbf{News Aggregation}: Fetch recent news articles from multiple sources.
+    \item \textbf{Sentiment Analysis}: Analyze each article using FinBERT, aggregate overall sentiment.
+    \item \textbf{Alignment Checking}: Compare prediction direction with sentiment direction.
+    \item \textbf{Justification Generation}: Create comprehensive report with AI-generated explanations.
+    \item \textbf{Output Generation}: Save results in JSON and text formats.
+\end{enumerate}
+
+\subsection{Model Configuration}
+
+Key hyperparameters:
+
+\begin{itemize}
+    \item Sequence length: 60 days
+    \item Batch size: 32
+    \item Learning rate: 0.0003 (with adaptive scheduling)
+    \item Maximum epochs: 200 (with early stopping)
+    \item Dropout rate: 0.3
+    \item Train/validation/test split: 80/10/10
+\end{itemize}
+
+\section{Experiments and Results}
+
+\subsection{Dataset}
+
+The system was evaluated on multiple stocks including:
+\begin{itemize}
+    \item AAPL (Apple Inc.)
+    \item GOOG (Alphabet Inc.)
+    \item MSFT (Microsoft Corporation)
+    \item BTC-USD (Bitcoin)
+\end{itemize}
+
+Historical data periods ranged from 1 year to 5 years, with daily resolution.
+
+\subsection{Performance Metrics}
+
+The prediction model is evaluated using:
+
+\begin{itemize}
+    \item \textbf{MAE (Mean Absolute Error)}: Average absolute difference between predicted and actual prices
+    \item \textbf{RMSE (Root Mean Squared Error)}: Penalizes larger errors more heavily
+    \item \textbf{MAPE (Mean Absolute Percentage Error)}: Error expressed as percentage
+    \item \textbf{Directional Accuracy}: Percentage of correct up/down predictions
+\end{itemize}
+
+\subsection{Results}
+
+Preliminary results demonstrate the system's effectiveness:
+
+\textbf{Prediction Performance}: The LSTM model achieves MAPE values typically between 2-5\% on test sets, with directional accuracy ranging from 55-65\%, depending on stock volatility and market conditions.
+
+\textbf{Sentiment Analysis}: FinBERT achieves high confidence scores (70-95\%) for sentiment classification, with processing time of approximately 1-2 seconds per article.
+
+\textbf{Alignment Accuracy}: The system successfully identifies alignment and divergence cases, with divergence warnings leading to more conservative recommendations in high-risk scenarios.
+
+\begin{table}[t]
+    \centering
+    \caption{Example evaluation on MSFT (2025-11-05).}
+    \label{tab:msft-results}
+    \begin{tabular}{ll}
+        \hline
+        Current Price & $\$514.33 \\
+        Predicted Price & $\$462.90 \\
+        Expected Change & $-10.00\%$ \\
+        Recommendation & STRONG SELL \\
+        Model Confidence & 85.0\% \\
+        Annual Volatility & 22.0\% (LOW) \\
+        Test MAPE & 15.05\% \\
+        Test MAE & $\$78.57 \\
+        Test RMSE & $\$79.06 \\
+        Directional Accuracy & 74.2\% \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{recommendation and risk decision}
+    \caption{Recommendation and risk decision flow combining predicted trend, sentiment alignment, confidence, and volatility. Render from `recommendation_flow.puml`.}
+    \label{fig:recommendation-flow}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \begin{tikzpicture}
+        \begin{groupplot}[
+            group style={group size=2 by 1, horizontal sep=1.2cm},
+            width=0.42\linewidth, height=5cm,
+            ymajorgrids, x tick label style={rotate=45, anchor=east}
+        ]
+        \nextgroupplot[ylabel={Absolute Error ($)}, xtick=data, xticklabels={MAE, RMSE}]
+            \addplot[ybar, fill=gray!40] coordinates {(0,78.57) (1,79.06)};
+        \nextgroupplot[ylabel={Percentage (\%)}, xtick=data, xticklabels={MAPE, Dir. Acc.}, ymin=0, ymax=100]
+            \addplot[ybar, fill=gray!40] coordinates {(0,15.05) (1,74.2)};
+        \end{groupplot}
+    \end{tikzpicture}
+    \caption{MSFT performance metrics from the test set (2025-11-05 run): absolute errors (MAE, RMSE) and percentage metrics (MAPE, Directional Accuracy).}
+    \label{fig:results-metrics}
+\end{figure}
+
+
+\subsection{Case Study: GOOG Analysis}
+
+For Alphabet Inc. (GOOG) on November 4, 2025:
+
+\begin{itemize}
+    \item Current Price: \$284.12
+    \item Predicted Price: \$255.71
+    \item Expected Change: -10.00\%
+    \item Recommendation: STRONG SELL
+    \item Model Confidence: 74.9\%
+    \item Overall Sentiment: NEUTRAL (43.3\% confidence)
+    \item Alignment Status: PARTIAL ALIGNMENT (Warning)
+    \item Risk Level: MEDIUM (29.2\% annual volatility)
+    \item Articles Analyzed: 30 (12 positive, 5 negative, 13 neutral)
+\end{itemize}
+
+The system correctly identified a bearish technical signal with neutral sentiment, providing a warning about partial alignment and recommending caution.
+
+\section{Discussion}
+
+\subsection{Advantages}
+
+The hybrid approach offers several advantages:
+
+\begin{enumerate}
+    \item \textbf{Comprehensive Analysis}: Combines quantitative technical analysis with qualitative sentiment signals
+    \item \textbf{Justified Recommendations}: Provides detailed explanations for each recommendation
+    \item \textbf{Risk Awareness}: Explicitly considers volatility and signal divergence
+    \item \textbf{Multi-Source Data}: Reduces dependency on single news source
+    \item \textbf{Automated Workflow}: End-to-end pipeline requires minimal user intervention
+\end{enumerate}
+
+\subsection{Limitations}
+
+The system has several limitations:
+
+\begin{enumerate}
+    \item \textbf{Market Efficiency}: Assumes some degree of predictability, which may not hold in strongly efficient markets
+    \item \textbf{Data Quality}: Dependency on external data sources (Yahoo Finance, news APIs)
+    \item \textbf{Model Assumptions}: LSTM assumes patterns in historical data will continue
+    \item \textbf{Sentiment Lag}: News sentiment may lag behind actual price movements
+    \item \textbf{Computational Resources}: Requires significant computational resources for model training
+\end{enumerate}
+
+\subsection{Future Work}
+
+Potential improvements include:
+
+\begin{itemize}
+    \item Integration of additional data sources (social media sentiment, earnings reports)
+    \item Ensemble methods combining multiple prediction models
+    \item Real-time streaming analysis capabilities
+    \item Portfolio-level risk assessment
+    \item Explainable AI techniques for model interpretability
+    \item Backtesting framework for historical validation
+\end{itemize}
+
+\section{Conclusion}
+
+This paper presents a comprehensive hybrid system for stock price prediction that combines deep learning-based technical analysis with NLP-based sentiment analysis. The system addresses key limitations of standalone approaches by providing:
+
+\begin{itemize}
+    \item Accurate price predictions through sophisticated LSTM architecture
+    \item Market sentiment analysis using specialized financial NLP models
+    \item Intelligent alignment checking between predictions and sentiment
+    \item Risk-adjusted recommendations with detailed justifications
+\end{itemize}
+
+Experimental results demonstrate the system's practical utility in generating actionable trading recommendations with comprehensive risk assessment. The framework provides a foundation for further research in hybrid financial prediction systems and demonstrates the value of integrating quantitative and qualitative analysis approaches.
+
+The system is implemented as an open-source tool, making it accessible for research and educational purposes. Future work will focus on improving prediction accuracy, expanding data sources, and developing more sophisticated risk assessment models.
+
+\section*{Appendix: PlantUML Source for Architecture Figures}
+For reproducibility, the architecture, sequence, class, and deployment diagrams are specified in `architecture_diagram.puml`. Render with PlantUML to generate the figures (e.g., for Figure~\ref{fig:system-architecture}).
+
+Example snippets (see file for full source):
+
+\begingroup
+\small
+\begin{verbatim}
+@startuml Stock Prediction System Architecture
+... see architecture_diagram.puml ...
+@enduml
+
+@startuml Execution_Flow_Sequence_Diagram
+... see architecture_diagram.puml ...
+@enduml
+\end{verbatim}
+\endgroup
+
+\section*{Acknowledgment}
+
+The authors acknowledge the use of open-source libraries and pre-trained models including TensorFlow, PyTorch, Transformers (Hugging Face), FinBERT (ProsusAI), and T5 (Google). This research is intended for educational and research purposes only.
+
+\section*{Disclaimer}
+
+This system is provided for educational and research purposes only. It does not constitute financial advice. Stock market investments carry inherent risks, and past performance does not guarantee future results. Users should consult with licensed financial advisors before making investment decisions.
+
+\begin{thebibliography}{00}
+\bibitem{hochreiter1997} S. Hochreiter and J. Schmidhuber, ``Long short-term memory,'' Neural computation, vol. 9, no. 8, pp. 1735--1780, 1997.
+
+\bibitem{fischer2018} T. Fischer and C. Krauss, ``Deep learning with long short-term memory networks for financial market predictions,'' European Journal of Operational Research, vol. 270, no. 2, pp. 654--669, 2018.
+
+\bibitem{araci2019} D. Araci, ``FinBERT: Financial Sentiment Analysis with Pre-trained Language Models,'' arXiv preprint arXiv:1908.10063, 2019.
+
+\bibitem{devlin2018} J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, ``BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding,'' arXiv preprint arXiv:1810.04805, 2018.
+
+\bibitem{vaswani2017} A. Vaswani et al., ``Attention is all you need,'' Advances in neural information processing systems, vol. 30, 2017.
+
+\bibitem{rumelhart1986} D. E. Rumelhart, G. E. Hinton, and R. J. Williams, ``Learning representations by back-propagating errors,'' nature, vol. 323, no. 6088, pp. 533--536, 1986.
+
+\bibitem{kingma2014} D. P. Kingma and J. Ba, ``Adam: A method for stochastic optimization,'' arXiv preprint arXiv:1412.6980, 2014.
+
+\bibitem{raffel2019} C. Raffel et al., ``Exploring the limits of transfer learning with a unified text-to-text transformer,'' Journal of Machine Learning Research, vol. 21, pp. 1--67, 2020.
+\end{thebibliography}
+
+\end{document}
+

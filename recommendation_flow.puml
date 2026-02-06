@@ -1,0 +1,65 @@
+@startuml Recommendation_Decision_Flow
+
+!theme plain
+title Recommendation & Risk Decision Flow
+
+start
+if (Predicted % change > +2%) then (yes)
+  :Trend = Bullish;
+elseif (Predicted % change > +0.5%) then (yes)
+  :Trend = Mild Bullish;
+elseif (Predicted % change < -2%) then (yes)
+  :Trend = Bearish;
+elseif (Predicted % change < -0.5%) then (yes)
+  :Trend = Mild Bearish;
+else
+  :Trend = Flat;
+endif
+
+if (Overall Sentiment?) then (Positive)
+  :Sentiment = +1;
+elseif (Negative)
+  :Sentiment = -1;
+else
+  :Sentiment = 0;
+endif
+
+if (Trend vs Sentiment) then (Aligned)
+  :Alignment = STRONG/PARTIAL;
+else
+  :Alignment = DIVERGENCE;
+endif
+
+if (Annual volatility < 25%) then (LOW)
+  :Risk = LOW;
+elseif (Annual volatility <= 40%) then (MEDIUM)
+  :Risk = MEDIUM;
+else
+  :Risk = HIGH;
+endif
+
+if (Trend Bullish and Alignment strong and confidence high) then (yes)
+  :Recommendation = STRONG BUY;
+elseif (Trend Mild Bullish) then (yes)
+  :Recommendation = BUY;
+elseif (Trend Flat or confidence low) then (yes)
+  :Recommendation = HOLD;
+elseif (Trend Mild Bearish) then (yes)
+  :Recommendation = SELL;
+else
+  :Recommendation = STRONG SELL;
+endif
+
+if (Alignment = DIVERGENCE) then (yes)
+  :Downgrade one level;
+endif
+
+if (Risk = HIGH) then (yes)
+  :Use smaller position size;
+endif
+
+:Output final recommendation + risk note;
+stop
+
+@enduml
+

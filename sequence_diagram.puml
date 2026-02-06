@@ -1,0 +1,52 @@
+@startuml Sequence_Full_Pipeline
+
+!theme plain
+title End-to-End Analysis Pipeline (Sequence)
+
+actor User
+participant "Pipeline" as Orchestrator
+participant "Data Ingestion" as Ingest
+participant "Feature Engineering" as Features
+participant "LSTM Model" as LSTM
+participant "News Aggregation" as NewsAgg
+participant "FinBERT Sentiment" as FinBERT
+participant "Alignment & Justification" as Align
+database "Local Storage" as FS
+
+User -> Orchestrator: Provide symbol, period
+activate Orchestrator
+
+Orchestrator -> Ingest: Fetch OHLCV
+activate Ingest
+Ingest -> FS: Save cleaned data
+deactivate Ingest
+
+Orchestrator -> Features: Build indicators & sequences
+activate Features
+Features --> LSTM: Training/Prediction inputs
+deactivate Features
+
+Orchestrator -> LSTM: Train (if needed) & Predict next price
+activate LSTM
+LSTM -> FS: Save metrics, model, predictions
+deactivate LSTM
+
+Orchestrator -> NewsAgg: Collect recent news
+activate NewsAgg
+NewsAgg -> FinBERT: Analyze sentiment per article
+activate FinBERT
+FinBERT -> NewsAgg: Sentiment scores
+deactivate FinBERT
+NewsAgg -> FS: Save sentiment data
+deactivate NewsAgg
+
+Orchestrator -> Align: Combine prediction + sentiment
+activate Align
+Align -> FS: Save justification & recommendation
+deactivate Align
+
+Orchestrator --> User: Show outputs summary
+deactivate Orchestrator
+
+@enduml
+

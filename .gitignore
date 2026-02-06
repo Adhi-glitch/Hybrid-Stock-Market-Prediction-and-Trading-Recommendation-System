@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Configuration (contains API keys)
+config.py
+
+# Generated Data Files
+live_data.json
+live_data.csv
+*.h5
+*_prediction_results.json
+*_prediction_summary.txt
+*_metrics.csv
+*_justification.txt
+*_sentiment_analysis.json
+
+# Model Files
+*_best_model.h5
+*.pb
+*.ckpt
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+.env.local
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary Files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
