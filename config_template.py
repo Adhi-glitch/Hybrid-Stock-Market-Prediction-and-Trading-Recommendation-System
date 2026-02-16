@@ -14,19 +14,19 @@ Add it to .gitignore to keep your keys secure.
 
 # NewsAPI - Get free key at: https://newsapi.org
 # Free tier: 100 requests per day
-NEWSAPI_KEY = "aeadd16edf8947f2b765f81947cf67b5"  # Enter your key here: "your_newsapi_key_here"
+NEWSAPI_KEY = ""  # Enter your key here: "your_newsapi_key_here"
 
 # Alpha Vantage - Get free key at: https://www.alphavantage.co
 # Free tier: 25 requests per day
-ALPHA_VANTAGE_KEY = "Q1HA9DH8YMGZF680"  # Enter your key here: "your_alphavantage_key_here"
+ALPHA_VANTAGE_KEY = ""  # Enter your key here: "your_alphavantage_key_here"
 
 # Finnhub - Get free key at: https://finnhub.io
 # Free tier: 60 API calls per minute
-FINNHUB_KEY = "d3v3lk1r01qt2ctntoc0d3v3lk1r01qt2ctntocg"  # Enter your key here: "your_finnhub_key_here"
+FINNHUB_KEY = ""  # Enter your key here: "your_finnhub_key_here"
 
 # MarketAux - Get free key at: https://www.marketaux.com
 # Free tier: 100 requests per day
-MARKETAUX_KEY = "RqDtbZ3cqxMcWdqlFtiK3i97wF2KLsTl1BWHN142"  # Enter your key here: "your_marketaux_key_here"
+MARKETAUX_KEY = ""  # Enter your key here: "your_marketaux_key_here"
 
 # =============================================================================
 # MODEL CONFIGURATION (Advanced users)
