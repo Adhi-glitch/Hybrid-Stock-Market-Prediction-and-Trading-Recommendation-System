@@ -24,7 +24,7 @@ SEED = 42
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
 
-# --- 2. PROFESSIONAL TRADER FEATURE ENGINEERING ---
+# --- 2. TRADER FEATURE ENGINEERING ---
 
 def calculate_professional_indicators(df):
     """Calculate all professional trading indicators"""
@@ -165,7 +165,7 @@ def calculate_rsi(df, window=14):
     # Handle division by zero
     rs = avg_gain / (avg_loss + 1e-10)
     df['rsi'] = 100 - (100 / (1 + rs))
-    df['rsi'] = df['rsi'].fillna(50)  # Neutral RSI for NaN values
+    df['rsi'] = df['rsi'].fillna(50)
     return df
 
 def calculate_macd(df, fast=12, slow=26, signal=9):
@@ -468,8 +468,6 @@ def inverse_transform_predictions(scaled_predictions, scaler, feature_count, clo
 # --- 4. MODEL ARCHITECTURE ---
 
 def attention_block(inputs):
-    """Attention mechanism with normalization"""
-    # Calculate attention scores using GlobalAveragePooling1D for simplicity
     attention_probs = GlobalAveragePooling1D()(inputs)
     attention_probs = Dense(inputs.shape[-1], activation='softmax')(attention_probs)
     attention_probs = tf.keras.layers.Reshape((1, -1))(attention_probs)
@@ -477,11 +475,7 @@ def attention_block(inputs):
     return attention_mul
 
 def build_professional_trader_model(input_shape, learning_rate=0.0003):
-    """Professional-grade model optimized for single-point future prediction"""
     inp = Input(shape=input_shape)
-    
-    # === SIMPLIFIED BUT POWERFUL ARCHITECTURE ===
-    # Focus on price prediction accuracy rather than complexity
     
     # Primary LSTM branch for temporal patterns
     x = Bidirectional(LSTM(256, return_sequences=True))(inp)
@@ -511,7 +505,7 @@ def build_professional_trader_model(input_shape, learning_rate=0.0003):
     x = Dense(32, activation='relu')(x)
     x = Dropout(0.1)(x)
     
-    # === SINGLE PRICE PREDICTION OUTPUT ===
+    # === SINGLE PRICE PREDICTION ===
     price_prediction = Dense(1, activation='linear', name='price_prediction')(x)
     
     # === CONFIDENCE OUTPUT ===
@@ -520,21 +514,18 @@ def build_professional_trader_model(input_shape, learning_rate=0.0003):
     # Create model with multiple outputs
     model = Model(inputs=inp, outputs=[price_prediction, confidence])
     
-    # === PROFESSIONAL OPTIMIZER ===
+    # === OPTIMIZER ===
     optimizer = Adam(
         learning_rate=learning_rate,
         beta_1=0.9,
         beta_2=0.999,
         epsilon=1e-8,
-        clipnorm=0.3  # Reduced gradient clipping
+        clipnorm=0.3 
     )
     
-    # === PROFESSIONAL LOSS FUNCTIONS ===
+    # ===LOSS FUNCTIONS ===
     def professional_loss(y_true, y_pred):
-        """Custom loss function optimized for price prediction"""
-        # Use MSE for better price accuracy
         mse_loss = tf.keras.losses.MeanSquaredError()(y_true, y_pred)
-        # Add small Huber component for robustness
         huber_loss = tf.keras.losses.Huber(delta=1.0)(y_true, y_pred)
         return 0.8 * mse_loss + 0.2 * huber_loss
     
@@ -549,7 +540,7 @@ def build_professional_trader_model(input_shape, learning_rate=0.0003):
             'price_prediction': professional_loss,
             'confidence': confidence_loss
         },
-        loss_weights={'price_prediction': 1.0, 'confidence': 0.05},  # Reduced confidence weight
+        loss_weights={'price_prediction': 1.0, 'confidence': 0.05}, 
         metrics={
             'price_prediction': ['mae', 'mse'],
             'confidence': ['accuracy']
@@ -689,7 +680,7 @@ if __name__ == "__main__":
     print(f"  X_val: {X_val.shape}, y_val: {y_val.shape}")
     print(f"  X_test: {X_test.shape}, y_test: {y_test.shape}")
     
-    # Build professional trader model
+    # Build trader model
     print("\nBuilding professional trader model...")
     model = build_professional_trader_model(
         input_shape=(X_train.shape[1], X_train.shape[2]),
@@ -956,113 +947,5 @@ if __name__ == "__main__":
         recommendation, confidence, test_metrics, volatility, risk_level,
         train_metrics, val_metrics, data_info
     )
-    
-    # Visualization
-    print("\n Generating visualizations...")
-    
-    # Plot 1: Training History
-    fig, axes = plt.subplots(1, 2, figsize=(15, 5))
-    
-    # Plot training history for multi-output model
-    axes[0].plot(history.history['price_prediction_loss'], label='Training Price Loss', alpha=0.8)
-    axes[0].plot(history.history['val_price_prediction_loss'], label='Validation Price Loss', alpha=0.8)
-    axes[0].set_title('Price Prediction Loss During Training')
-    axes[0].set_xlabel('Epoch')
-    axes[0].set_ylabel('Loss')
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
-    
-    axes[1].plot(history.history['price_prediction_mae'], label='Training MAE', alpha=0.8)
-    axes[1].plot(history.history['val_price_prediction_mae'], label='Validation MAE', alpha=0.8)
-    axes[1].set_title('Price Prediction MAE During Training')
-    axes[1].set_xlabel('Epoch')
-    axes[1].set_ylabel('MAE')
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    plt.show()
-    
-    # Plot 2: Interactive Plotly Chart
-    # Prepare data for plotting
-    test_dates = test_df.index[sequence_length:]
-    
-    # Ensure all arrays have the same length
-    min_len = min(len(test_dates), len(y_test_actual), len(test_pred))
-    test_dates = test_dates[:min_len]
-    y_test_plot = y_test_actual[:min_len]
-    test_pred_plot = test_pred[:min_len]
-    
-    fig = go.Figure()
-    
-    # Add actual prices
-    fig.add_trace(go.Scatter(
-        x=test_dates,
-        y=y_test_plot,
-        mode='lines',
-        name='Actual Price',
-        line=dict(color='blue', width=2)
-    ))
-    
-    # Add predictions
-    fig.add_trace(go.Scatter(
-        x=test_dates,
-        y=test_pred_plot,
-        mode='lines',
-        name='Predicted Price',
-        line=dict(color='red', width=2, dash='dot')
-    ))
-    
-    # Add confidence band (simplified)
-    error_margin = np.std(y_test_plot - test_pred_plot)
-    fig.add_trace(go.Scatter(
-        x=test_dates,
-        y=test_pred_plot + error_margin,
-        mode='lines',
-        line=dict(color='rgba(255,0,0,0)'),
-        showlegend=False,
-        hoverinfo='skip'
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=test_dates,
-        y=test_pred_plot - error_margin,
-        mode='lines',
-        line=dict(color='rgba(255,0,0,0)'),
-        fill='tonexty',
-        fillcolor='rgba(255,0,0,0.1)',
-        name='Confidence Band',
-        hoverinfo='skip'
-    ))
-    
-    # Add next day prediction
-    fig.add_trace(go.Scatter(
-        x=[df.index[-1] + pd.Timedelta(days=1)],
-        y=[next_day_price],
-        mode='markers',
-        marker=dict(color='green', size=12, symbol='star'),
-        name='Next Day Prediction'
-    ))
-    
-    fig.update_layout(
-        title=f"{stock_name} - Stock Price Prediction (Test MAPE: {test_metrics['MAPE']:.2f}%)",
-        xaxis_title='Date',
-        yaxis_title='Price ($)',
-        hovermode='x unified',
-        legend=dict(
-            yanchor="top",
-            y=0.99,
-            xanchor="left",
-            x=0.01,
-            bgcolor="rgba(255, 255, 255, 0.8)",
-            bordercolor="Black",
-            borderwidth=1
-        ),
-        template='plotly_white',
-        height=600
-    )
-    
-    fig.show()
-    
     print("\n Analysis complete!")
     print("="*60)
